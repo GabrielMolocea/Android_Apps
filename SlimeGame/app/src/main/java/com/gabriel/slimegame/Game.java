@@ -9,6 +9,12 @@ import android.view.SurfaceView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
+
+/**
+ * Game manages all objects in the game and is responsible for updating and rendering
+ * of all objects to screen
+ */
+
 public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private GameLoop gameLoop;
     private Context context;
@@ -29,7 +35,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
-
+        gameLoop.startLoop();
     }
 
     @Override
@@ -49,17 +55,27 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         drawFPS(canvas);
     }
 
+
+    //  Methods for Updates per second and
+    // Frames per second
     public void drawUPS(Canvas canvas) {
         String averageUPS = Double.toString(gameLoop.getAverageUPS());
         Paint paint = new Paint();
         int color = ContextCompat.getColor(context, R.color.magenta);
-        canvas.drawText("UPS: " + averageUPS, 100, 20, paint);
+        paint.setColor(color);
+        paint.setTextSize(50);
+        canvas.drawText("UPS: " + averageUPS, 0, 20, paint);
     }
 
     public void drawFPS(Canvas canvas) {
         String averageFPS = Double.toString(gameLoop.getAverageFPS());
         Paint paint = new Paint();
         int color = ContextCompat.getColor(context, R.color.magenta);
-        canvas.drawText("FPS: " + averageFPS, 100, 40, paint);
+        paint.setColor(color);
+        paint.setTextSize(50);
+        canvas.drawText("FPS: " + averageFPS, 0, 60, paint);
+    }
+
+    public void update() {
     }
 }
