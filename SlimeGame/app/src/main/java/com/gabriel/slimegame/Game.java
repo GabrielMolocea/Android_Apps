@@ -16,8 +16,8 @@ import androidx.core.content.ContextCompat;
  */
 
 public class Game extends SurfaceView implements SurfaceHolder.Callback {
+    private final Slime slime;
     private GameLoop gameLoop;
-    private Context context;
 
     public Game(Context context) {
         super(context);
@@ -26,9 +26,10 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         SurfaceHolder surfaceHolder = getHolder();
         surfaceHolder.addCallback(this);
 
-        this.context = context;
-
         gameLoop = new GameLoop(this, surfaceHolder);
+
+        // Initialize player(slime)
+        slime = new Slime();
 
         setFocusable(true);
     }
@@ -53,6 +54,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         super.draw(canvas);
         drawUPS(canvas);
         drawFPS(canvas);
+        slime.draw(canvas);
     }
 
 
@@ -61,21 +63,22 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     public void drawUPS(Canvas canvas) {
         String averageUPS = Double.toString(gameLoop.getAverageUPS());
         Paint paint = new Paint();
-        int color = ContextCompat.getColor(context, R.color.magenta);
+        int color = ContextCompat.getColor(getContext(), R.color.magenta);
         paint.setColor(color);
         paint.setTextSize(50);
-        canvas.drawText("UPS: " + averageUPS, 0, 20, paint);
+        canvas.drawText("UPS: " + averageUPS, 0, 40, paint);
     }
 
     public void drawFPS(Canvas canvas) {
         String averageFPS = Double.toString(gameLoop.getAverageFPS());
         Paint paint = new Paint();
-        int color = ContextCompat.getColor(context, R.color.magenta);
+        int color = ContextCompat.getColor(getContext(), R.color.magenta);
         paint.setColor(color);
         paint.setTextSize(50);
-        canvas.drawText("FPS: " + averageFPS, 0, 60, paint);
+        canvas.drawText("FPS: " + averageFPS, 0, 80, paint);
     }
 
     public void update() {
+        slime.update();
     }
 }
