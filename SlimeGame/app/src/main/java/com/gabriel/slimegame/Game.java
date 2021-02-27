@@ -3,6 +3,7 @@ package com.gabriel.slimegame;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -29,9 +30,21 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         gameLoop = new GameLoop(this, surfaceHolder);
 
         // Initialize player(slime)
-        slime = new Slime();
+        slime = new Slime(getContext(), 500, 500, 30);
 
         setFocusable(true);
+    }
+
+    // Handle on touch actions on user
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                slime.jumpSlime((double) event.getX(), (double) event.getY());
+                return true;
+        }
+        return super.onTouchEvent(event);
     }
 
     @Override
