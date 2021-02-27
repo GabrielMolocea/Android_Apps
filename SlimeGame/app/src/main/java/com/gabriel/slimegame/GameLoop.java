@@ -46,22 +46,30 @@ public class GameLoop extends Thread {
         long sleepTime;
 
         // Game loop and is responsible for running the game
-        Canvas canvas;
+        Canvas canvas = null;
         startTime = System.currentTimeMillis();
         while (isRunning) {
 
             //  For each chicle is trying ro update and render game
             try {
                 canvas = surfaceHolder.lockCanvas();
-                game.update();
-                game.draw(canvas);
-                surfaceHolder.unlockCanvasAndPost(canvas);
+                synchronized (surfaceHolder) {
+                    game.update();
+                    updateCount++;
+                    game.draw(canvas);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                if (canvas != null) {
+                    try {
+                        surfaceHolder.unlockCanvasAndPost(canvas);
+                        frameCount++;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-
-            frameCount++;
-            updateCount++;
 
             // Pause game to not exceed the target UPS
             elapseTime = System.currentTimeMillis() - startTime;
@@ -76,7 +84,12 @@ public class GameLoop extends Thread {
 
             // Skipping frames to keep the target UPS
 
-
+            while (sleepTime < 0 && updateCount < MAX_UPS - 1) {
+                game.update();
+                updateCount++;
+                elapseTime = System.currentTimeMillis() - startTime;
+                sleepTime = (long) (updateCount * UPS_PERIOD - elapseTime);
+            }
 
             // Calculating average UPS and FPS
             elapseTime = System.currentTimeMillis() - startTime;
