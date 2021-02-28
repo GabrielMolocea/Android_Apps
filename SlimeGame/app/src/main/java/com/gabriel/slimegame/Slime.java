@@ -33,8 +33,8 @@ public class Slime {
     }
 
     public void jumpSlime(double positionX, double positionY) {
-        this.positionX = positionX + 100;
-        this.positionY = positionY + 100;
+        this.positionX = positionX;
+        this.positionY = positionY;
 
     }
 }
