@@ -32,7 +32,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         gameLoop = new GameLoop(this, surfaceHolder);
 
         // Initialize game objects
-        joystick = new Joystick(275, 350, 70, 40);
+        joystick = new Joystick(275, 700, 70, 40);
         slime = new Slime(getContext(), 500, 500, 30);
 
         setFocusable(true);
@@ -44,7 +44,21 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                slime.jumpSlime((double) event.getX(), (double) event.getY());
+                if (joystick.isPressed((double) event.getX(), (double) event.getY())) {
+                    joystick.setIsPressed(true);
+                }
+
+//                slime.jumpSlime((double) event.getX(), (double) event.getY());
+                return true;
+            case MotionEvent.ACTION_MOVE:
+                if (joystick.getIsPressed()) {
+                    joystick.setActuator((double) event.getX(), (double) event.getY());
+                }
+//                slime.jumpSlime((double) event.getX(), (double) event.getY());
+                return true;
+            case MotionEvent.ACTION_UP:
+                joystick.setIsPressed(false);
+                joystick.resetActuator();
                 return true;
         }
         return super.onTouchEvent(event);
@@ -98,7 +112,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
     public void update() {
         joystick.update();
-        slime.update();
+        slime.update(joystick);
 
     }
 }

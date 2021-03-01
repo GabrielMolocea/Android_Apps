@@ -14,6 +14,10 @@ public class Joystick {
     private int outerCircleCenterPositionY;
     private int innerCircleCenterPositionX;
     private int innerCircleCenterPositionY;
+    private double joystickCenterToTouchDistance;
+    private boolean isPressed;
+    private double actuatorX;
+    private double actuatorY;
 
     public Joystick(int centerPositionX, int centerPositionY, int outerCircleRadius, int innerCircleRadius) {
 
@@ -47,6 +51,65 @@ public class Joystick {
         );
     }
 
+    public double calculateDistanceBetweenPoints(double x1, double x2, double y1, double y2) {
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    }
+
     public void update() {
+        updateInnerCirclePosition();
+    }
+
+    private void updateInnerCirclePosition() {
+        innerCircleCenterPositionX = (int) (outerCircleCenterPositionX + actuatorX * outerCircleRadius);
+        innerCircleCenterPositionY = (int) (outerCircleCenterPositionY + actuatorY * outerCircleRadius);
+
+    }
+
+    public boolean isPressed(double touchPositionX, double touchPositionY) {
+        joystickCenterToTouchDistance =
+                calculateDistanceBetweenPoints(
+                outerCircleCenterPositionX, touchPositionX,
+                outerCircleCenterPositionY, touchPositionY
+                );
+        
+        return joystickCenterToTouchDistance < outerCircleRadius;
+    }
+
+    public void setIsPressed(boolean isPressed) {
+        this.isPressed = isPressed;
+    }
+
+    public boolean getIsPressed() {
+        return isPressed;
+    }
+
+    public void setActuator(double touchPositionX, double touchPositionY) {
+        double deltaX = touchPositionX - outerCircleCenterPositionX;
+        double deltaY = touchPositionY - outerCircleCenterPositionY;
+        double deltaDistance =  calculateDistanceBetweenPoints(
+                outerCircleCenterPositionX, touchPositionX,
+                outerCircleCenterPositionY, touchPositionY
+        );
+
+        if (deltaDistance < outerCircleRadius) {
+            actuatorX = deltaX / outerCircleRadius;
+            actuatorY = deltaY / outerCircleRadius;
+        } else {
+            actuatorX = deltaX / deltaDistance;
+            actuatorY = deltaY / deltaDistance;
+        }
+    }
+
+
+    public void resetActuator() {
+        actuatorX = 0.0;
+        actuatorY = 0.0;
+    }
+
+    public double getActuatorX() {
+        return actuatorX;
+    }
+    public double getActuatorY() {
+        return actuatorY;
     }
 }
