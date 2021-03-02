@@ -16,6 +16,7 @@ public class Slime {
     private Paint paint;
     private double velocityX;
     private double velocityY;
+    private Joystick joystick;
 
     public Slime(Context context, double positionX, double positionY, double radius) {
         this.positionX = positionX;
@@ -34,10 +35,15 @@ public class Slime {
     }
 
     public void update(Joystick joystick) {
-        velocityX = joystick.getActuatorX() * MAX_SPEED;
-        velocityX = joystick.getActuatorY() * MAX_SPEED;
+        // Update velocity based on actuator of joystick
+        velocityX = joystick.getActuatorX()*MAX_SPEED;
+        velocityY = joystick.getActuatorY()*MAX_SPEED;
+
+        // Update position
         positionX += velocityX;
         positionY += velocityY;
+
+
     }
 
     public void jumpSlime(double positionX, double positionY) {

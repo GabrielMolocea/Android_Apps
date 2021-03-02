@@ -42,19 +42,16 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        switch (event.getActionMasked()) {
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (joystick.isPressed((double) event.getX(), (double) event.getY())) {
                     joystick.setIsPressed(true);
                 }
-
-//                slime.jumpSlime((double) event.getX(), (double) event.getY());
                 return true;
             case MotionEvent.ACTION_MOVE:
                 if (joystick.getIsPressed()) {
                     joystick.setActuator((double) event.getX(), (double) event.getY());
                 }
-//                slime.jumpSlime((double) event.getX(), (double) event.getY());
                 return true;
             case MotionEvent.ACTION_UP:
                 joystick.setIsPressed(false);
