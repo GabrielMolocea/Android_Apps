@@ -10,6 +10,9 @@ import android.view.SurfaceView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
+import com.gabriel.slimegame.objects.Enemy;
+import com.gabriel.slimegame.objects.Player;
+
 
 /**
  * Game manages all objects in the game and is responsible for updating and rendering
@@ -34,8 +37,8 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         // Initialize game objects
         joystick = new Joystick(275, 700, 70, 40);
-        player = new Player(getContext(), 500, 500, 30);
-        enemy = new Enemy();
+        player = new Player(getContext(), joystick , 500, 500, 30);
+        enemy = new Enemy(getContext(), player , 500, 20, 20);
         setFocusable(true);
     }
 
@@ -85,6 +88,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         joystick.draw(canvas);
         player.draw(canvas);
+        enemy.draw(canvas);
     }
 
 
@@ -110,7 +114,8 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
     public void update() {
         joystick.update();
-        player.update(joystick);
+        player.update();
+        enemy.update();
 
     }
 }
