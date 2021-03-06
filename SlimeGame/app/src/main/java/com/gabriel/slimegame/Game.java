@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat;
 import com.gabriel.slimegame.objects.Circle;
 import com.gabriel.slimegame.objects.Enemy;
 import com.gabriel.slimegame.objects.Player;
+import com.gabriel.slimegame.objects.Spell;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,6 +30,9 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private final Joystick joystick;
     private GameLoop gameLoop;
     private List<Enemy> enemyList = new ArrayList<>();
+    private List<Spell> spellList = new ArrayList<Spell>();
+    private int joystickPointedId = 0;
+    private int numberOfSpellsToCast = 0;
 
     public Game(Context context) {
         super(context);
@@ -50,20 +54,34 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        switch (event.getAction()) {
+        switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                if (joystick.isPressed((double) event.getX(), (double) event.getY())) {
+            case MotionEvent.ACTION_POINTER_DOWN:
+                if (joystick.getIsPressed()){
+                    // Joystick was press before the event ->  cast spell
+                    numberOfSpellsToCast++;
+                } else if (joystick.isPressed((double) event.getX(), (double) event.getY())) {
+                    // Joystick is pressed in this event  -> setIsPressed(true) and store ID
+                    joystickPointedId = event.getPointerId(event.getActionIndex());
                     joystick.setIsPressed(true);
+                } else {
+                    //Joystick was not pressed, and is not pressed in this event -> cast spell
+                    spellList.add(new Spell(getContext(),player));
                 }
                 return true;
             case MotionEvent.ACTION_MOVE:
+                // Joystick was pressed previously and is now moved
                 if (joystick.getIsPressed()) {
                     joystick.setActuator((double) event.getX(), (double) event.getY());
                 }
                 return true;
             case MotionEvent.ACTION_UP:
-                joystick.setIsPressed(false);
-                joystick.resetActuator();
+            case MotionEvent.ACTION_POINTER_UP:
+                if (joystickPointedId == event.getPointerId(event.getActionIndex())) {
+                    // Joystick was let go of -> setIsPressed(false) and resetActuator
+                    joystick.setIsPressed(false);
+                    joystick.resetActuator();
+                }
                 return true;
         }
         return super.onTouchEvent(event);
@@ -92,8 +110,13 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         joystick.draw(canvas);
         player.draw(canvas);
+
         for (Enemy enemy : enemyList) {
             enemy.draw(canvas);
+        }
+
+        for (Spell spell : spellList) {
+            spell.draw(canvas);
         }
     }
 
@@ -123,22 +146,45 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         player.update();
 
         // Spawn enemy if is time to spawn
-        if (Enemy.isReadyToSpawn()) {
+        if (Enemy.readyToSpawn()) {
             enemyList.add(new Enemy(getContext(), player));
         }
 
         //  Update the state of each enemy
+
+        while (numberOfSpellsToCast > 0 ) {
+            spellList.add(new Spell(getContext(),player));
+            numberOfSpellsToCast--;
+        }
         for (Enemy enemy : enemyList) {
             enemy.update();
         }
 
+        //  Update the state of each spell
+        for (Spell spell : spellList) {
+            spell.update();
+        }
+
          //Iterate through @enemyList and check for collision between enemy and player
+        // and all spells
         Iterator<Enemy> iteratorEnemy = enemyList.iterator();
         while (iteratorEnemy.hasNext()) {
-            if (Circle.isColliding(iteratorEnemy.next(), player)){
+            Circle enemy = iteratorEnemy.next();
+            if (Circle.isColliding(enemy, player)){
                 // Remove enemy if it collided with the player
                 iteratorEnemy.remove();
                 continue;
+            }
+
+            Iterator<Spell> iteratorSpell = spellList.iterator();
+            while (iteratorSpell.hasNext()) {
+                Circle spell = iteratorSpell.next();
+                // Remove sell if is collided with the enemy
+                if (Circle.isColliding(spell, enemy)) {
+                    iteratorSpell.remove();
+                    iteratorEnemy.remove();
+                    break;
+                }
             }
         }
     }

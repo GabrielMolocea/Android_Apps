@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 import com.gabriel.slimegame.GameLoop;
 import com.gabriel.slimegame.Joystick;
 import com.gabriel.slimegame.R;
+import com.gabriel.slimegame.Utils;
 
 public class Player extends Circle {
 
@@ -30,10 +31,14 @@ public class Player extends Circle {
         // Update position
         positionX += velocityX;
         positionY += velocityY;
+
+        // Update direction
+        if (velocityX != 0 || velocityY != 0) {
+            // Normalize velocity to get direction (unit vector of velocity)
+            double distance = Utils.getDistanceBetweenObjects(0, 0, velocityX, velocityY);
+            directionX = velocityX / distance;
+            directionY = velocityY / distance;
+        }
     }
 
-//    public void jumpSlime(double positionX, double positionY) {
-//        this.positionX = positionX;
-//        this.positionY = positionY;
-//    }
 }

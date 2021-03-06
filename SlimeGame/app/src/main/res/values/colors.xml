@@ -10,4 +10,5 @@
     <color name="magenta">#FF0090</color>
     <color name="slime">#09AA1F</color>
     <color name="enemy">#7C4D06</color>
+    <color name="spell">#00C0FB</color>
 </resources>
