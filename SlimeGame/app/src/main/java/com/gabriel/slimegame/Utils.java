@@ -3,6 +3,7 @@ package com.gabriel.slimegame;
 public class Utils {
     /**
      * getDistanceBetweenObjects returns the distance between 2d points p1 and p2
+     *
      * @param p1x
      * @param p1y
      * @param p2x

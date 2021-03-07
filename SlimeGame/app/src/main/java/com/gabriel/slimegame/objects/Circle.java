@@ -20,6 +20,7 @@ public abstract class Circle extends GameObject {
 
     /**
      * isColliding checks if two circles objects are colliding, base on the position and radii
+     *
      * @param object1
      * @param object2
      * @return
@@ -38,7 +39,7 @@ public abstract class Circle extends GameObject {
     }
 
     public void draw(Canvas canvas) {
-        canvas.drawCircle((float) positionX, (float)positionY, (float)radius, paint);
+        canvas.drawCircle((float) positionX, (float) positionY, (float) radius, paint);
     }
 
 

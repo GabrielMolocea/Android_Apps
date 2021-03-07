@@ -6,13 +6,12 @@ import android.view.SurfaceHolder;
 public class GameLoop extends Thread {
 
     public static final double MAX_UPS = 30.0;
-    private static final double UPS_PERIOD = 1E+3/MAX_UPS;
+    private static final double UPS_PERIOD = 1E+3 / MAX_UPS;
     private Game game;
     private SurfaceHolder surfaceHolder;
     private boolean isRunning = false;
     private double averageUPS;
     private double averageFPS;
-
 
 
     public GameLoop(Game game, SurfaceHolder surfaceHolder) {
@@ -93,9 +92,9 @@ public class GameLoop extends Thread {
 
             // Calculating average UPS and FPS
             elapseTime = System.currentTimeMillis() - startTime;
-            if (elapseTime >=  1000) {
+            if (elapseTime >= 1000) {
                 averageUPS = updateCount / (1E-3 * elapseTime); // 1E-3 -> 10 at power -3
-                averageFPS = frameCount  / (1E-3 * elapseTime); // 1E-3 -> 10 at power -3
+                averageFPS = frameCount / (1E-3 * elapseTime); // 1E-3 -> 10 at power -3
                 updateCount = 0;
                 frameCount = 0;
                 startTime = System.currentTimeMillis();

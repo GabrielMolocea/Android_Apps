@@ -11,4 +11,6 @@
     <color name="slime">#09AA1F</color>
     <color name="enemy">#7C4D06</color>
     <color name="spell">#00C0FB</color>
+    <color name="healthBarBorder">#A5A5A5</color>
+    <color name="healthBarHealth">#FF0000</color>
 </resources>

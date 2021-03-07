@@ -24,6 +24,7 @@ public class Enemy extends Circle {
 
     /**
      * Enemy is an overload constructor used for spawning enemies in random locations
+     *
      * @param context
      * @param player
      */
@@ -31,8 +32,8 @@ public class Enemy extends Circle {
         super(
                 context,
                 ContextCompat.getColor(context, R.color.enemy),
-                Math.random()*1000,
-                Math.random()*1000,
+                Math.random() * 1000,
+                Math.random() * 1000,
                 30
         );
         this.player = player;
@@ -41,6 +42,7 @@ public class Enemy extends Circle {
     /**
      * readyToSpawn checks if a new enemy should spawn, according to the decided number of spawns
      * per minute (see SPAWNS_PER_MINUTE at top)
+     *
      * @return
      */
     public static boolean readyToSpawn() {
@@ -48,7 +50,7 @@ public class Enemy extends Circle {
             updatesUntilNextSpawn += UPDATES_PER_SPAWN;
             return true;
         } else {
-            updatesUntilNextSpawn --;
+            updatesUntilNextSpawn--;
             return false;
         }
     }
@@ -65,11 +67,11 @@ public class Enemy extends Circle {
         double distanceToPlayer = GameObject.getDistanceBetweenObjects(this, player);
 
         // Calculate direction from enemy to player
-        double directionX = distanceToPlayerX/distanceToPlayer;
-        double directionY = distanceToPlayerY/distanceToPlayer;
+        double directionX = distanceToPlayerX / distanceToPlayer;
+        double directionY = distanceToPlayerY / distanceToPlayer;
 
         // Set velocity in the direction to the player
-        if(distanceToPlayer > 0) { // Avoid division by zero
+        if (distanceToPlayer > 0) { // Avoid division by zero
             velocityX = directionX * MAX_SPEED;
             velocityY = directionY * MAX_SPEED;
         } else {

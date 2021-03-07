@@ -45,7 +45,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         // Initialize game objects
         joystick = new Joystick(275, 700, 70, 40);
-        player = new Player(getContext(), joystick , 500, 500, 30);
+        player = new Player(getContext(), joystick, 500, 500, 30);
 
         setFocusable(true);
     }
@@ -57,7 +57,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_POINTER_DOWN:
-                if (joystick.getIsPressed()){
+                if (joystick.getIsPressed()) {
                     // Joystick was press before the event ->  cast spell
                     numberOfSpellsToCast++;
                 } else if (joystick.isPressed((double) event.getX(), (double) event.getY())) {
@@ -66,7 +66,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
                     joystick.setIsPressed(true);
                 } else {
                     //Joystick was not pressed, and is not pressed in this event -> cast spell
-                    spellList.add(new Spell(getContext(),player));
+                    spellList.add(new Spell(getContext(), player));
                 }
                 return true;
             case MotionEvent.ACTION_MOVE:
@@ -152,8 +152,8 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         //  Update the state of each enemy
 
-        while (numberOfSpellsToCast > 0 ) {
-            spellList.add(new Spell(getContext(),player));
+        while (numberOfSpellsToCast > 0) {
+            spellList.add(new Spell(getContext(), player));
             numberOfSpellsToCast--;
         }
         for (Enemy enemy : enemyList) {
@@ -165,14 +165,15 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
             spell.update();
         }
 
-         //Iterate through @enemyList and check for collision between enemy and player
+        //Iterate through @enemyList and check for collision between enemy and player
         // and all spells
         Iterator<Enemy> iteratorEnemy = enemyList.iterator();
         while (iteratorEnemy.hasNext()) {
             Circle enemy = iteratorEnemy.next();
-            if (Circle.isColliding(enemy, player)){
+            if (Circle.isColliding(enemy, player)) {
                 // Remove enemy if it collided with the player
                 iteratorEnemy.remove();
+                player.setHealthPoints(player.getHealthPoints() - 1);
                 continue;
             }
 
