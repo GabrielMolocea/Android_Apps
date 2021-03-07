@@ -1,4 +1,4 @@
-package com.gabriel.slimegame;
+package com.gabriel.slimegame.game_panels;
 
 import android.graphics.Canvas;
 import android.graphics.Color;

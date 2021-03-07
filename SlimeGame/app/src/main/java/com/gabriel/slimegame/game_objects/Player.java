@@ -1,4 +1,4 @@
-package com.gabriel.slimegame.objects;
+package com.gabriel.slimegame.game_objects;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -6,7 +6,7 @@ import android.graphics.Canvas;
 import androidx.core.content.ContextCompat;
 
 import com.gabriel.slimegame.GameLoop;
-import com.gabriel.slimegame.Joystick;
+import com.gabriel.slimegame.game_panels.Joystick;
 import com.gabriel.slimegame.R;
 import com.gabriel.slimegame.Utils;
 

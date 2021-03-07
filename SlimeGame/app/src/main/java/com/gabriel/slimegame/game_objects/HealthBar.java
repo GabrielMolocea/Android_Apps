@@ -1,4 +1,4 @@
-package com.gabriel.slimegame.objects;
+package com.gabriel.slimegame.game_objects;
 
 import android.content.Context;
 import android.graphics.Canvas;
