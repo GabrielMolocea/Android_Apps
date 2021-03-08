@@ -31,7 +31,7 @@ public class HealthBar {
         // Creating the health in the border Object
         this.healthPaint = new Paint();
         int healthColor = ContextCompat.getColor(context, R.color.healthBarHealth);
-        healthPaint.setColor(borderColor);
+        healthPaint.setColor(healthColor);
 
 
     }
