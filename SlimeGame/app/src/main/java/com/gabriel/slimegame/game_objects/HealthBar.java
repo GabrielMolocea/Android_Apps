@@ -6,6 +6,7 @@ import android.graphics.Paint;
 
 import androidx.core.content.ContextCompat;
 
+import com.gabriel.slimegame.GameDisplay;
 import com.gabriel.slimegame.R;
 
 /**
@@ -36,7 +37,7 @@ public class HealthBar {
 
     }
 
-    public void draw(Canvas canvas) {
+    public void draw(Canvas canvas, GameDisplay gameDisplay) {
 
         float x = (float) player.getPositionX();
         float y = (float) player.getPositionY();
@@ -51,7 +52,12 @@ public class HealthBar {
         borderBottom = y - distanceToPlayer;
         borderTop = borderBottom - height;
 
-        canvas.drawRect(borderLeft, borderTop, borderRight, borderBottom, borderPaint);
+        canvas.drawRect(
+                (float) gameDisplay.gameToDisplayCoordinatesX(borderLeft),
+                (float) gameDisplay.gameToDisplayCoordinatesX(borderTop),
+                (float) gameDisplay.gameToDisplayCoordinatesX(borderRight),
+                (float) gameDisplay.gameToDisplayCoordinatesX(borderBottom),
+                borderPaint);
 
         // Draw health
         float healthLeft, healthTop, healthRight, healthBottom, healthWidth, healthHeight;
@@ -61,6 +67,12 @@ public class HealthBar {
         healthRight = healthLeft + healthWidth * healthPointPercentage;
         healthBottom = borderBottom - margin;
         healthTop = borderBottom - height;
-        canvas.drawRect(healthLeft, healthTop, healthRight, healthBottom, healthPaint);
+        canvas.drawRect(
+                (float) gameDisplay.gameToDisplayCoordinatesX(healthLeft),
+                (float) gameDisplay.gameToDisplayCoordinatesX(healthTop),
+                (float) gameDisplay.gameToDisplayCoordinatesX(healthRight),
+                (float) gameDisplay.gameToDisplayCoordinatesX(healthBottom),
+                healthPaint
+        );
     }
 }

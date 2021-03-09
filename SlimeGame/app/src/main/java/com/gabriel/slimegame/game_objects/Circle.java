@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import com.gabriel.slimegame.GameDisplay;
+
 public abstract class Circle extends GameObject {
 
     protected double radius;
@@ -38,8 +40,13 @@ public abstract class Circle extends GameObject {
         return radius;
     }
 
-    public void draw(Canvas canvas) {
-        canvas.drawCircle((float) positionX, (float) positionY, (float) radius, paint);
+    public void draw(Canvas canvas, GameDisplay gameDisplay) {
+        canvas.drawCircle(
+                (float) gameDisplay.gameToDisplayCoordinatesX(positionX),
+                (float)  gameDisplay.gameToDisplayCoordinatesY(positionY),
+                (float) radius,
+                paint
+        );
     }
 
 

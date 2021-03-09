@@ -2,6 +2,8 @@ package com.gabriel.slimegame.game_objects;
 
 import android.graphics.Canvas;
 
+import com.gabriel.slimegame.GameDisplay;
+
 public abstract class GameObject {
 
     protected double positionX;
@@ -23,15 +25,15 @@ public abstract class GameObject {
         );
     }
 
-    public abstract void draw(Canvas canvas);
+    public abstract void draw(Canvas canvas, GameDisplay gameDisplay);
 
     public abstract void update();
 
-    protected double getPositionX() {
+    public double getPositionX() {
         return positionX;
     }
 
-    protected double getPositionY() {
+    public double getPositionY() {
         return positionY;
     }
 
