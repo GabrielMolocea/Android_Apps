@@ -4,19 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context=".DriverLoginActivity"
     android:orientation="vertical">
 
-    <Button
-        android:id="@+id/driver"
+    <EditText
+        android:id="@+id/email_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="I`m a Driver"/>
+        android:hint="Email address"/>
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"/>
 
     <Button
-        android:id="@+id/customer"
+        android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="I`m a Customer"/>
+        android:text="Login"
+        />
+
+    <Button
+        android:id="@+id/register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        />
 
 </LinearLayout>
