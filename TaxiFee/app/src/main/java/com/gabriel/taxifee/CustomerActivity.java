@@ -14,11 +14,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-/**
- * DriverLoginActivity is responsible for authentication of user or adding a new one
- */
-public class DriverLoginActivity extends AppCompatActivity {
-
+public class CustomerActivity extends AppCompatActivity {
 
 
     // Initialization of objects for Driver Login
@@ -33,7 +29,7 @@ public class DriverLoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_driver_login);
+        setContentView(R.layout.activity_customer);
 
         // Implementing FireBase authentication
         authentication = FirebaseAuth.getInstance();
@@ -42,15 +38,13 @@ public class DriverLoginActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (user != null) {
-                    Intent intent = new Intent(DriverLoginActivity.this, MainActivity.class);
+                    Intent intent = new Intent(CustomerActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
                     return;
                 }
             }
         };
-
-
 
         // Buttons of DriverActivity
         loginButton = (Button) findViewById(R.id.login);
@@ -66,16 +60,16 @@ public class DriverLoginActivity extends AppCompatActivity {
             final String password = passwordText.getText().toString();
 
             authentication.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(DriverLoginActivity.this, task -> {
+                    .addOnCompleteListener(CustomerActivity.this, task -> {
                         if (!task.isSuccessful()) {
-                            Toast.makeText(DriverLoginActivity.this, "Sign up error", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CustomerActivity.this, "Sign in error", Toast.LENGTH_SHORT).show();
                         } else {
                             String userID = authentication.getCurrentUser().getUid();
                             DatabaseReference currentUserDB = FirebaseDatabase.
                                     getInstance()
                                     .getReference()
                                     .child("Users")
-                                    .child("Driver")
+                                    .child("Customer")
                                     .child(userID);
                             currentUserDB.setValue(true);
                         }
@@ -86,11 +80,12 @@ public class DriverLoginActivity extends AppCompatActivity {
             final String email = emailText.getText().toString();
             final String password = passwordText.getText().toString();
 
-            authentication.signInWithEmailAndPassword(email, password).addOnCompleteListener(DriverLoginActivity.this, task -> {
-                if (!task.isSuccessful()) {
-                    Toast.makeText(DriverLoginActivity.this, "Sign in error", Toast.LENGTH_SHORT).show();
-                }
-            });
+            authentication.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(CustomerActivity.this, task -> {
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(CustomerActivity.this, "Sign in error", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
         });
     }

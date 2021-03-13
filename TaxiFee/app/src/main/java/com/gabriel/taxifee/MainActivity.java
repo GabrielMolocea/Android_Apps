@@ -29,5 +29,12 @@ public class MainActivity extends AppCompatActivity {
             finish();
             return;
         });
+
+        buttonCustomer.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, CustomerActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        });
     }
 }
