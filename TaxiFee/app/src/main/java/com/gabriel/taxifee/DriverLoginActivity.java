@@ -2,11 +2,11 @@ package com.gabriel.taxifee;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,16 +37,13 @@ public class DriverLoginActivity extends AppCompatActivity {
 
         // Implementing FireBase authentication
         authentication = FirebaseAuth.getInstance();
-        fireBaseOfListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user != null) {
-                    Intent intent = new Intent(DriverLoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                    return;
-                }
+        fireBaseOfListener = firebaseAuth -> {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                Intent intent = new Intent(DriverLoginActivity.this, DriverMapActivity.class);
+                startActivity(intent);
+                finish();
+                return;
             }
         };
 
@@ -64,6 +61,14 @@ public class DriverLoginActivity extends AppCompatActivity {
         registrationButton.setOnClickListener(v -> {
             final String email = emailText.getText().toString();
             final String password = passwordText.getText().toString();
+            if (email.isEmpty()) {
+                Log.d("DriverActivity.java", "Email is null");
+                Toast.makeText(DriverLoginActivity.this, "Please enter your email", Toast.LENGTH_SHORT).show();
+            }
+            if (password.isEmpty()) {
+                Log.d("DriverActivity.java", "Email is null");
+                Toast.makeText(DriverLoginActivity.this, "Please enter your password", Toast.LENGTH_SHORT).show();
+            }
 
             authentication.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(DriverLoginActivity.this, task -> {
