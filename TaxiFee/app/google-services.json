@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "711795801211",
+    "firebase_url": "https://faxifee-default-rtdb.firebaseio.com",
     "project_id": "faxifee",
     "storage_bucket": "faxifee.appspot.com"
   },
