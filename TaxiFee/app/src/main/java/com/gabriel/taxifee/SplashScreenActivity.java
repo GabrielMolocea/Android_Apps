@@ -2,8 +2,11 @@ package com.gabriel.taxifee;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,11 +15,18 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
@@ -26,6 +36,14 @@ public class SplashScreenActivity extends AppCompatActivity {
     private List<AuthUI.IdpConfig> providers;
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener listener;
+
+    // initialization of firebase database
+    FirebaseDatabase database;
+    DatabaseReference driverInfoRef;
+
+    // Initialization of progressbar
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
 
     @Override
     protected void onStart() {
@@ -44,12 +62,18 @@ public class SplashScreenActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setContentView(R.layout.activity_splash_screen);
         init();
         
     }
 
     private void init() {
+
+        ButterKnife.bind(this);
+
+        database = FirebaseDatabase.getInstance();
+        driverInfoRef = database.getReference(_Common.DRIVER_INFO_REFERENCE);
+
         providers = Arrays.asList(
                 new AuthUI.IdpConfig.PhoneBuilder().build(),
                 new AuthUI.IdpConfig.GoogleBuilder().build());
@@ -59,11 +83,30 @@ public class SplashScreenActivity extends AppCompatActivity {
         listener = myFirebaseAuth -> {
             FirebaseUser user = myFirebaseAuth.getCurrentUser();
             if (user != null) {
+
+                checkUserFromFirebase();
+
                Toast.makeText(this, "Welcome: " + user.getUid(), Toast.LENGTH_SHORT).show();
+               progressBar.setVisibility(View.VISIBLE);
             } else {
                 showLoginLayout();
             }
         };
+    }
+
+    private void checkUserFromFirebase() {
+        driverInfoRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void showLoginLayout() {
@@ -83,6 +126,9 @@ public class SplashScreenActivity extends AppCompatActivity {
     }
 
     private void displaySplashScreen() {
+
+        progressBar.setVisibility(View.VISIBLE);
+
         Completable.timer(3, TimeUnit.SECONDS,
                 AndroidSchedulers.mainThread())
                 .subscribe(() ->  firebaseAuth.addAuthStateListener(listener));
