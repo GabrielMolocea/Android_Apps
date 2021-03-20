@@ -99,14 +99,21 @@ public class SplashScreenActivity extends AppCompatActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        
+                        if (snapshot.exists()) {
+                            Toast.makeText(SplashScreenActivity.this, "User already register", Toast.LENGTH_SHORT).show();
+                        } else {
+                            showRegisterLayout();
+                        }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+                        Toast.makeText(SplashScreenActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void showRegisterLayout() {
     }
 
     private void showLoginLayout() {

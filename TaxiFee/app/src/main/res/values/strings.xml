@@ -2,4 +2,9 @@
     <string name="app_name">TaxiFee</string>
     <string name="sign_in_with_phone">Sign in with Phone</string>
     <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="register_text">Let\'s start with creating your account</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="continue_text">Continue…</string>
 </resources>
