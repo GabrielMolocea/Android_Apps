@@ -9,9 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TaxiFee">
-        <activity android:name=".SplashScreenActivity"
-            android:theme="@style/SplashTheme">
-        <intent-filter>
+        <activity android:name=".SplashScreenActivity">
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />

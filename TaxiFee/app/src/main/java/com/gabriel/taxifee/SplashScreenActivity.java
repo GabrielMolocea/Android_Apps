@@ -46,9 +46,15 @@ public class SplashScreenActivity extends AppCompatActivity {
     ProgressBar progressBar;
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash_screen);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
-       displaySplashScreen();
+        displaySplashScreen();
     }
 
     @Override
@@ -59,20 +65,12 @@ public class SplashScreenActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash_screen);
-        init();
-        
-    }
-
     private void init() {
 
         ButterKnife.bind(this);
 
         database = FirebaseDatabase.getInstance();
-        driverInfoRef = database.getReference(_Common.DRIVER_INFO_REFERENCE);
+        driverInfoRef = database.getReference(_common.DRIVER_INFO_REFERENCE);
 
         providers = Arrays.asList(
                 new AuthUI.IdpConfig.PhoneBuilder().build(),
@@ -86,8 +84,8 @@ public class SplashScreenActivity extends AppCompatActivity {
 
                 checkUserFromFirebase();
 
-               Toast.makeText(this, "Welcome: " + user.getUid(), Toast.LENGTH_SHORT).show();
-               progressBar.setVisibility(View.VISIBLE);
+                Toast.makeText(this, "Welcome: " + user.getUid(), Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.VISIBLE);
             } else {
                 showLoginLayout();
             }
@@ -115,7 +113,6 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     private void showRegisterLayout() {
     }
-
     private void showLoginLayout() {
         AuthMethodPickerLayout authMethodPickerLayout = new AuthMethodPickerLayout
                 .Builder(R.layout.layout_sign_in)
@@ -123,13 +120,13 @@ public class SplashScreenActivity extends AppCompatActivity {
                 .setGoogleButtonId(R.id.button_google_sign_in)
                 .build();
 
-       startActivityForResult(AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAuthMethodPickerLayout(authMethodPickerLayout)
-                        .setIsSmartLockEnabled(false)
-                        .setTheme(R.style.LoginTheme)
-                        .setAvailableProviders(providers)
-                        .build(), LOGIN_REQUEST_CODE);
+        startActivityForResult(AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAuthMethodPickerLayout(authMethodPickerLayout)
+                .setIsSmartLockEnabled(false)
+                .setTheme(R.style.LoginTheme)
+                .setAvailableProviders(providers)
+                .build(), LOGIN_REQUEST_CODE);
     }
 
     private void displaySplashScreen() {
