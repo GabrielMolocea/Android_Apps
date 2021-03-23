@@ -15,7 +15,6 @@
         android:gravity="center_horizontal"
         android:padding="16dp">
 
-
         <Button
             android:id="@+id/button_phone_sign_in"
             android:layout_width="match_parent"
@@ -27,9 +26,7 @@
             android:textSize="14sp"
             android:textColor="@color/black"
             android:background="@drawable/custom_button"
-            android:backgroundTintMode="add"
-            android:backgroundTint="@color/white"
-            />
+            android:backgroundTint="@color/white" />
 
         <Button
             android:id="@+id/button_google_sign_in"
