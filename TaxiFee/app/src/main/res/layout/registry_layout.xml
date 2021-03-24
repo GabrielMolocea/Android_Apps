@@ -86,11 +86,12 @@
     </LinearLayout>
 
     <Button
+        android:layout_margin="16dp"
         android:layout_alignParentBottom="true"
         android:id="@+id/button_register"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
+        android:background="@drawable/custom_button"
         android:text="@string/continue_text"
         style="@style/Widget.MaterialComponents.Button"/>
 

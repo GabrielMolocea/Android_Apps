@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "711795801211",
+    "firebase_url": "https://faxifee-default-rtdb.firebaseio.com",
+    "project_id": "faxifee",
+    "storage_bucket": "faxifee.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:711795801211:android:2e42b198ed3941549d36de",
+        "android_client_info": {
+          "package_name": "com.gabriel.taxifee"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "711795801211-40c9fq0lmi8muaqgmgtp5k59i654g788.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gabriel.taxifee",
+            "certificate_hash": "cd4a02b1989bd9e4d18632039c5bbd163da07fd0"
+          }
+        },
+        {
+          "client_id": "711795801211-m1moaa5lr12e7ic79pjdd6a4u5p9k74f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDELHWCAZgit0glY6MdZ7qpnJV3XgAU2Bg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "711795801211-m1moaa5lr12e7ic79pjdd6a4u5p9k74f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

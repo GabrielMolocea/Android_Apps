@@ -1,5 +1,6 @@
 package com.gabriel.taxifee;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
+import com.gabriel.taxifee.model.DriverInfoModel;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -47,6 +49,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     DatabaseReference driverInfoRef;
 
     // Initialization of progressbar
+    @SuppressLint("NonConstantResourceId")
     @BindView(R.id.progress_bar)
     ProgressBar progressBar;
 
@@ -132,7 +135,37 @@ public class SplashScreenActivity extends AppCompatActivity {
             edit_phone_number.setText(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber());
         }
 
+        // Set view
+        builder.setView(itemView);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
 
+
+        button_continue.setOnClickListener(view -> {
+            if (TextUtils.isEmpty(edit_first_name.getText().toString())) {
+                Toast.makeText(this, "Please enter first name", Toast.LENGTH_SHORT).show();
+                return;
+            } else  if (TextUtils.isEmpty(edit_last_name.getText().toString())) {
+                Toast.makeText(this, "Please enter last name", Toast.LENGTH_SHORT).show();
+                return;
+            } else  if (TextUtils.isEmpty(edit_phone_number.getText().toString())) {
+                Toast.makeText(this, "Please enter phone number", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                DriverInfoModel model = new DriverInfoModel();
+                model.setFirstName(edit_first_name.getText().toString());
+                model.setLastName(edit_last_name.getText().toString());
+                model.setPhoneNumber(edit_phone_number.getText().toString());
+                model.setRating(0.0);
+
+                driverInfoRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .setValue(model)
+                        .addOnFailureListener(e -> Toast.makeText(SplashScreenActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show())
+                        .addOnSuccessListener(aVoid -> Toast.makeText(SplashScreenActivity.this, "Register Successful", Toast.LENGTH_SHORT).show());
+            }
+
+
+        });
     }
     private void showLoginLayout() {
         AuthMethodPickerLayout authMethodPickerLayout = new AuthMethodPickerLayout
@@ -150,6 +183,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 .build(), LOGIN_REQUEST_CODE);
     }
 
+    @SuppressLint("CheckResult")
     private void displaySplashScreen() {
 
         progressBar.setVisibility(View.VISIBLE);
