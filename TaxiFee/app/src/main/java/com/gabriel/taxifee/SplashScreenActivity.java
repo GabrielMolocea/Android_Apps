@@ -106,7 +106,9 @@ public class SplashScreenActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            Toast.makeText(SplashScreenActivity.this, "User already register", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(SplashScreenActivity.this, "User already register", Toast.LENGTH_SHORT).show();
+                            DriverInfoModel driverInfoModel = snapshot.getValue(DriverInfoModel.class);
+                            goToHomeActivity(driverInfoModel);
                         } else {
                             showRegisterLayout();
                         }
@@ -117,6 +119,12 @@ public class SplashScreenActivity extends AppCompatActivity {
                         Toast.makeText(SplashScreenActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void goToHomeActivity(DriverInfoModel driverInfoModel) {
+        _common.currentUser = driverInfoModel; // Init Value
+        startActivity(new Intent(SplashScreenActivity.this, DriverHomeActivity.class));
+        finish();
     }
 
     private void showRegisterLayout() {
