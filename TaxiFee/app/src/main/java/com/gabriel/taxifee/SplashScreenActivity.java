@@ -1,6 +1,5 @@
 package com.gabriel.taxifee;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -35,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Completable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
@@ -49,7 +47,6 @@ public class SplashScreenActivity extends AppCompatActivity {
     DatabaseReference driverInfoRef;
 
     // Initialization of progressbar
-    @SuppressLint("NonConstantResourceId")
     @BindView(R.id.progress_bar)
     ProgressBar progressBar;
 
@@ -169,7 +166,11 @@ public class SplashScreenActivity extends AppCompatActivity {
                 driverInfoRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                         .setValue(model)
                         .addOnFailureListener(e -> Toast.makeText(SplashScreenActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show())
-                        .addOnSuccessListener(aVoid -> Toast.makeText(SplashScreenActivity.this, "Register Successful", Toast.LENGTH_SHORT).show());
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(SplashScreenActivity.this, "Register Successful", Toast.LENGTH_SHORT).show();
+                            goToHomeActivity(model);
+                        });
+
             }
 
 
@@ -191,14 +192,15 @@ public class SplashScreenActivity extends AppCompatActivity {
                 .build(), LOGIN_REQUEST_CODE);
     }
 
-    @SuppressLint("CheckResult")
     private void displaySplashScreen() {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        Completable.timer(3, TimeUnit.SECONDS,
-                AndroidSchedulers.mainThread())
-                .subscribe(() ->  firebaseAuth.addAuthStateListener(listener));
+        Completable.timer(2, TimeUnit.SECONDS);
+
+//        Completable.timer(3, TimeUnit.SECONDS,
+//                AndroidSchedulers.mainThread())
+//                .subscribe(() ->  firebaseAuth.addAuthStateListener(listener));
     }
 
     @Override
