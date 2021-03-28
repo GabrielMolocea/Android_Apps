@@ -22,7 +22,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:drawableStart="@drawable/ic_baseline_phone_24"
-            android:drawableTint="@color/black"
             android:padding="16dp"
             android:text="@string/sign_in_with_phone"
             android:textSize="14sp"

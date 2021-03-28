@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
@@ -54,6 +55,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
+        init();
     }
 
     @Override
@@ -86,9 +88,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         listener = myFirebaseAuth -> {
             FirebaseUser user = myFirebaseAuth.getCurrentUser();
             if (user != null) {
-
                 checkUserFromFirebase();
-
                 Toast.makeText(this, "Welcome: " + user.getUid(), Toast.LENGTH_SHORT).show();
                 progressBar.setVisibility(View.VISIBLE);
             } else {
@@ -165,10 +165,14 @@ public class SplashScreenActivity extends AppCompatActivity {
 
                 driverInfoRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                         .setValue(model)
-                        .addOnFailureListener(e -> Toast.makeText(SplashScreenActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show())
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(SplashScreenActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            alertDialog.dismiss();
+                        })
                         .addOnSuccessListener(aVoid -> {
                             Toast.makeText(SplashScreenActivity.this, "Register Successful", Toast.LENGTH_SHORT).show();
-                            goToHomeActivity(model);
+                            //goToHomeActivity(model);
+                            alertDialog.dismiss();
                         });
 
             }
@@ -196,11 +200,8 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        Completable.timer(2, TimeUnit.SECONDS);
-
-//        Completable.timer(3, TimeUnit.SECONDS,
-//                AndroidSchedulers.mainThread())
-//                .subscribe(() ->  firebaseAuth.addAuthStateListener(listener));
+        Completable.timer(3, TimeUnit.SECONDS,
+                AndroidSchedulers.mainThread()).subscribe(() ->  firebaseAuth.addAuthStateListener(listener));
     }
 
     @Override
