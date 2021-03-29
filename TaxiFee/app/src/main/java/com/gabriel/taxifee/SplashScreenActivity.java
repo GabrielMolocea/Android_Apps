@@ -1,5 +1,6 @@
 package com.gabriel.taxifee;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -29,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -98,24 +100,29 @@ public class SplashScreenActivity extends AppCompatActivity {
     }
 
     private void checkUserFromFirebase() {
-        driverInfoRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            //Toast.makeText(SplashScreenActivity.this, "User already register", Toast.LENGTH_SHORT).show();
-                            DriverInfoModel driverInfoModel = snapshot.getValue(DriverInfoModel.class);
-                            goToHomeActivity(driverInfoModel);
-                        } else {
-                            showRegisterLayout();
+        try {
+            driverInfoRef.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                //Toast.makeText(SplashScreenActivity.this, "User already register", Toast.LENGTH_SHORT).show();
+                                DriverInfoModel driverInfoModel = snapshot.getValue(DriverInfoModel.class);
+                                goToHomeActivity(driverInfoModel);
+                            } else {
+                                showRegisterLayout();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Toast.makeText(SplashScreenActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(SplashScreenActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } catch (NullPointerException e) {
+            showRegisterLayout();
+        }
+
     }
 
     private void goToHomeActivity(DriverInfoModel driverInfoModel) {
@@ -128,14 +135,14 @@ public class SplashScreenActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.DialogTheme);
         View itemView = LayoutInflater.from(this).inflate(R.layout.registry_layout, null);
 
-        TextInputEditText edit_first_name = (TextInputEditText) itemView.findViewById(R.id.edit_first_name);
-        TextInputEditText edit_last_name = (TextInputEditText) itemView.findViewById(R.id.edit_last_name);
-        TextInputEditText edit_phone_number = (TextInputEditText) itemView.findViewById(R.id.edit_phone_number);
+        TextInputEditText edit_first_name = itemView.findViewById(R.id.edit_first_name);
+        TextInputEditText edit_last_name = itemView.findViewById(R.id.edit_last_name);
+        TextInputEditText edit_phone_number = itemView.findViewById(R.id.edit_phone_number);
 
-        Button button_continue = (Button) itemView.findViewById(R.id.button_continue);
+        Button button_continue = itemView.findViewById(R.id.button_continue);
 
         // Set data
-        if (FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber() != null &&
+        if (Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhoneNumber() != null &&
                 !TextUtils.isEmpty(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())) {
             edit_phone_number.setText(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber());
         }
@@ -147,15 +154,12 @@ public class SplashScreenActivity extends AppCompatActivity {
 
 
         button_continue.setOnClickListener(view -> {
-            if (TextUtils.isEmpty(edit_first_name.getText().toString())) {
+            if (TextUtils.isEmpty(Objects.requireNonNull(edit_first_name.getText()).toString())) {
                 Toast.makeText(this, "Please enter first name", Toast.LENGTH_SHORT).show();
-                return;
-            } else  if (TextUtils.isEmpty(edit_last_name.getText().toString())) {
+            } else  if (TextUtils.isEmpty(Objects.requireNonNull(edit_last_name.getText()).toString())) {
                 Toast.makeText(this, "Please enter last name", Toast.LENGTH_SHORT).show();
-                return;
-            } else  if (TextUtils.isEmpty(edit_phone_number.getText().toString())) {
+            } else  if (TextUtils.isEmpty(Objects.requireNonNull(edit_phone_number.getText()).toString())) {
                 Toast.makeText(this, "Please enter phone number", Toast.LENGTH_SHORT).show();
-                return;
             } else {
                 DriverInfoModel model = new DriverInfoModel();
                 model.setFirstName(edit_first_name.getText().toString());
@@ -171,8 +175,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                         })
                         .addOnSuccessListener(aVoid -> {
                             Toast.makeText(SplashScreenActivity.this, "Register Successful", Toast.LENGTH_SHORT).show();
-                            //goToHomeActivity(model);
                             alertDialog.dismiss();
+                            goToHomeActivity(model);
                         });
 
             }
@@ -196,12 +200,13 @@ public class SplashScreenActivity extends AppCompatActivity {
                 .build(), LOGIN_REQUEST_CODE);
     }
 
+    @SuppressLint("CheckResult")
     private void displaySplashScreen() {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        Completable.timer(3, TimeUnit.SECONDS,
-                AndroidSchedulers.mainThread()).subscribe(() ->  firebaseAuth.addAuthStateListener(listener));
+        Completable.timer(3, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
+               .subscribe(() ->  firebaseAuth.addAuthStateListener(listener));
     }
 
     @Override
