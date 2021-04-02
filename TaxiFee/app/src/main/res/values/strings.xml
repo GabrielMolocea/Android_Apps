@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">TaxiFee</string>
     <string name="sign_in_with_phone">Sign in with Phone</string>
+    <string name="register_with_phone">Register with Phone</string>
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="register_text">Let\'s start with creating your account</string>
     <string name="first_name">First Name</string>

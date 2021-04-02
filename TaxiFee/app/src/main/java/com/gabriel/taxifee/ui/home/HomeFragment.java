@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.gabriel.taxifee.R;
 import com.gabriel.taxifee._common;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -113,6 +114,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         geoFire = new GeoFire(driverLocationRef);
 
+        registerOnlineSystem();
+
         locationRequest = new LocationRequest();
         locationRequest.setSmallestDisplacement(10f);
         locationRequest.setInterval(5000);
@@ -127,6 +130,17 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                 LatLng newPosition = new LatLng(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude());
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newPosition, 18f));
+
+                // Update Location
+                geoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                        new GeoLocation(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude()),
+                        (key, error) -> {
+                            if (error != null) {
+                                Snackbar.make(mapFragment.getView(), error.getMessage(), Snackbar.LENGTH_LONG).show();
+                            } else {
+                                Snackbar.make(mapFragment.getView(), "You're online", Snackbar.LENGTH_LONG).show();
+                            }
+                        });
             }
         };
 
@@ -169,14 +183,14 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                         });
 
                         // Set Layout button
-                        View locationButton = ((View)mapFragment.getView().findViewById(Integer.parseInt("1")).getParent())
+                        View locationButton = ((View) mapFragment.getView().findViewById(Integer.parseInt("1")).getParent())
                                 .findViewById(Integer.parseInt("2"));
                         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
 
                         // Right Button
                         params.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-                        params.setMargins(0, 0 , 0, 50);
+                        params.setMargins(0, 0, 0, 50);
 
                     }
 
@@ -194,10 +208,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         try {
             boolean successful = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.uber_maps_style));
             if (!successful) {
-                Log.e("TAXIFEE_ERROR","Style Parsing Error");
+                Log.e("TAXIFEE_ERROR", "Style Parsing Error");
             }
         } catch (Resources.NotFoundException e) {
-            Log.e("TAXIFEE_ERROR",e.getMessage());
+            Log.e("TAXIFEE_ERROR", e.getMessage());
         }
 
 
