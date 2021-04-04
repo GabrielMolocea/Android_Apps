@@ -19,6 +19,7 @@
         android:src="@mipmap/ic_launcher_round"
         app:civ_border_color="@color/white"
         app:civ_border_width="1dp"/>
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
