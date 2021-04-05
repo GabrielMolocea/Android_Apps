@@ -8,4 +8,10 @@ public class _common {
 
     public static DriverInfoModel currentUser;
 
+    public static String buildWelcomeMessage() {
+        return new StringBuilder("Welcome ")
+                .append(_common.currentUser.getFirstName())
+                .append(" ")
+                .append(_common.currentUser.getLastName()).toString();
+    }
 }
