@@ -1,6 +1,8 @@
 package com.gabriel.taxifee;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -8,6 +10,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -18,10 +21,15 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.bumptech.glide.Glide;
+import com.gabriel.taxifee.Utils.UserUtils;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class DriverHomeActivity extends AppCompatActivity {
 
@@ -33,6 +41,9 @@ public class DriverHomeActivity extends AppCompatActivity {
 
     private AlertDialog waitingDialog;
     private StorageReference storageReference;
+
+    private Uri imageUri;
+    private ImageView imageAvatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +67,70 @@ public class DriverHomeActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
 
         init();
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
+            if (data != null && data.getData() != null) {
+                imageUri = data.getData();
+                imageAvatar.setImageURI(imageUri);
+
+                showDialogUpdate();
+            }
+        }
+    }
+
+    // This method shows a dialog for confirmation of avatar changing
+    private void showDialogUpdate() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(DriverHomeActivity.this);
+        builder.setTitle("Change avatar")
+                .setMessage("Do you really want to change avatar ?")
+                .setNegativeButton("CANCEL", (dialog, which) -> dialog.dismiss())
+                .setPositiveButton("UPLOAD", (dialog, which) -> {
+                    if (imageUri != null) {
+                        waitingDialog.setMessage("Uploading...");
+                        waitingDialog.show();
+
+                        String uniqueName = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        StorageReference avatarFolder = storageReference.child("avatar/" + uniqueName);
+
+                        avatarFolder.putFile(imageUri)
+                                .addOnFailureListener(e -> {
+                                    waitingDialog.dismiss();
+                                    Snackbar.make(drawer, e.getMessage(), Snackbar.LENGTH_SHORT).show();
+                                })
+                                .addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+
+                                        avatarFolder.getDownloadUrl().addOnSuccessListener(uri -> {
+                                            Map<String, Object> updateData = new HashMap<>();
+                                            updateData.put("avatar", uri.toString());
+
+                                            UserUtils.updateUser(drawer, updateData);
+                                        });
+                                    }
+                                    waitingDialog.dismiss();
+                                })
+                                .addOnProgressListener(snapshot -> {
+                                    double progress = (100.00 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
+                                    waitingDialog.setMessage(new StringBuilder("Updating: ").append(progress).append(" %"));
+                                });
+                    }
+
+                })
+                .setCancelable(false);
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(dialog1 -> {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    .setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                    .setTextColor(getResources().getColor(R.color.black));
+        });
+
+        dialog.show();
     }
 
     private void init() {
@@ -100,20 +175,17 @@ public class DriverHomeActivity extends AppCompatActivity {
         TextView textPhone = headView.findViewById(R.id.textPhoneNumber);
         TextView textStar = headView.findViewById(R.id.txt_star);
 
-        ImageView imageAvatar = headView.findViewById(R.id.image_avatar);
+        imageAvatar = headView.findViewById(R.id.image_avatar);
 
         textName.setText(_common.buildWelcomeMessage());
         textPhone.setText(_common.currentUser != null ? _common.currentUser.getPhoneNumber() : "");
         textStar.setText(_common.currentUser != null ? String.valueOf(_common.currentUser.getRating()) : "0.0");
 
-        imageAvatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent, PICK_IMAGE_REQUEST);
-            }
+        imageAvatar.setOnClickListener(v -> {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(intent, PICK_IMAGE_REQUEST);
         });
 
         // Checking if current user and image for avatar are null and if not loading image for avatar
