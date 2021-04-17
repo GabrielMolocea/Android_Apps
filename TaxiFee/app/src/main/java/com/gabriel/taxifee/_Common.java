@@ -60,7 +60,12 @@ public class _common {
                     .setDefaults(Notification.DEFAULT_VIBRATE)
                     .setSmallIcon(R.drawable.ic_baseline_directions_car_24)
                     .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_baseline_directions_car_24));
-            
+
+            if (pendingIntent != null) {
+                builder.setContentIntent(pendingIntent);
+            }
+            Notification notification = builder.build();
+            notificationManager.notify(id, notification);
         }
     }
 }
