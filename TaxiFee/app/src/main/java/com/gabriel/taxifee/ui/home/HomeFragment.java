@@ -19,9 +19,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
-
     private HomeViewModel homeViewModel;
+    private GoogleMap mMap;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -30,7 +29,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment)getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         return root;
     }
