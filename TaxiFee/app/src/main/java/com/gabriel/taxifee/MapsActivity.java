@@ -15,11 +15,10 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 public class MapsActivity extends FragmentActivity {
@@ -71,29 +70,26 @@ public class MapsActivity extends FragmentActivity {
             return;
         }
         Task<Location> task = client.getLastLocation();
-        task.addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                // When success
-                if (location != null) {
-                    mapFragment.getMapAsync(new OnMapReadyCallback() {
-                        @Override
-                        public void onMapReady(GoogleMap googleMap) {
-                            mMap = googleMap;
+        task.addOnSuccessListener(location -> {
+            // When success
+            if (location != null) {
+                mapFragment.getMapAsync(googleMap -> {
+                    mMap = googleMap;
 
-                            mMap.getUiSettings().setZoomControlsEnabled(true);
-                            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    mMap.getUiSettings().setZoomControlsEnabled(true);
+                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-                            // Creating marker options
-                            MarkerOptions options = new MarkerOptions().position(latLng);
+                    // Creating marker options
+                    MarkerOptions options = new MarkerOptions().position(latLng);
 
-                            // Zoom map
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                    // Changing marker
+                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 
-                            mMap.addMarker(options);
-                        }
-                    });
-                }
+                    // Zoom map
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+
+                    mMap.addMarker(options);
+                });
             }
         });
     }
