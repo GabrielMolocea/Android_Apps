@@ -16,7 +16,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
@@ -61,7 +60,14 @@ public class MapsActivity extends FragmentActivity {
                             Manifest.permission.ACCESS_COARSE_LOCATION}, 44);
         }
 
+        setLocationToGo();
     }
+
+    private void setLocationToGo() {
+        location.set
+
+    }
+
 
     public void getCurrentLocation() {
         // Initialize task location
@@ -76,6 +82,8 @@ public class MapsActivity extends FragmentActivity {
                 mapFragment.getMapAsync(googleMap -> {
                     mMap = googleMap;
 
+                    mMap.setMyLocationEnabled(true);
+
                     mMap.getUiSettings().setZoomControlsEnabled(true);
                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -83,10 +91,10 @@ public class MapsActivity extends FragmentActivity {
                     MarkerOptions options = new MarkerOptions().position(latLng);
 
                     // Changing marker
-                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                    options.alpha(0);
 
                     // Zoom map
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
 
                     mMap.addMarker(options);
                 });
