@@ -60,13 +60,8 @@ public class MapsActivity extends FragmentActivity {
                             Manifest.permission.ACCESS_COARSE_LOCATION}, 44);
         }
 
-        setLocationToGo();
     }
 
-    private void setLocationToGo() {
-        location.set
-
-    }
 
 
     public void getCurrentLocation() {
@@ -97,6 +92,24 @@ public class MapsActivity extends FragmentActivity {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
 
                     mMap.addMarker(options);
+
+                    // Adding new marker for user to select destination
+                    mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                        @Override
+                        public void onMapClick(LatLng latLng) {
+                            MarkerOptions newMarkerOption = new MarkerOptions();
+                            // Setting position
+                            newMarkerOption.position(latLng);
+                            // Setting Latitude and Longitude on Marker
+                            newMarkerOption.title(latLng.latitude + " : " + latLng.longitude);
+                            // Clearing the previously Click position
+                            mMap.clear();
+                            // Zooming to marker
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                            // Adding marker to map
+                            mMap.addMarker(newMarkerOption);
+                        }
+                    });
                 });
             }
         });
