@@ -27,7 +27,8 @@ public class MapsActivity extends FragmentActivity {
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
     private Button calculate_distance;
-    private Location location;
+    private LatLng latLngCurrent;
+    private Double destinationLat, destinationLong;
     FusedLocationProviderClient client;
 
 
@@ -80,41 +81,51 @@ public class MapsActivity extends FragmentActivity {
                     mMap.setMyLocationEnabled(true);
 
                     mMap.getUiSettings().setZoomControlsEnabled(true);
-                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    latLngCurrent = new LatLng(location.getLatitude(), location.getLongitude());
 
                     // Creating marker options
-                    MarkerOptions options = new MarkerOptions().position(latLng);
+                    MarkerOptions options = new MarkerOptions().position(latLngCurrent);
 
                     // Changing marker
                     options.alpha(0);
 
                     // Zoom map
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngCurrent, 18));
 
                     mMap.addMarker(options);
 
                     // Adding new marker for user to select destination
-                    mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-                        @Override
-                        public void onMapClick(LatLng latLng) {
-                            MarkerOptions newMarkerOption = new MarkerOptions();
-                            // Setting position
-                            newMarkerOption.position(latLng);
-                            // Setting Latitude and Longitude on Marker
-                            newMarkerOption.title(latLng.latitude + " : " + latLng.longitude);
-                            // Clearing the previously Click position
-                            mMap.clear();
-                            // Zooming to marker
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
-                            // Adding marker to map
-                            mMap.addMarker(newMarkerOption);
-                        }
+                    mMap.setOnMapClickListener(latLng1 -> {
+                        MarkerOptions newMarkerOption = new MarkerOptions();
+                        // Setting position
+                        newMarkerOption.position(latLng1);
+                        // Setting Latitude and Longitude on Marker
+                        newMarkerOption.title(latLng1.latitude + " : " + latLng1.longitude);
+                        // Clearing the previously Click position
+                        mMap.clear();
+                        // Zooming to marker
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng1, 10));
+                        // Adding marker to map
+                        mMap.addMarker(newMarkerOption);
+
+                        destinationLat = latLng1.latitude;
+                        destinationLong = latLng1.longitude;
                     });
                 });
             }
         });
     }
 
+    public void directions() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("https://maps.googleapis.com/maps/api/directions/json?");
+        stringBuilder.append("origin=" + latLngCurrent.latitude + "," + latLngCurrent.longitude);
+        stringBuilder.append("&destination="+ destinationLat + "," + destinationLong);
+        stringBuilder.append("&key=" + "AIzaSyC_BIhQV6k7XokRNsHjwYbqzX-Axt7RN2A");
+
+        GetDirectionsData getDirectionsData = new GetDirectionsData(getApplicationContext());
+
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == 44) {
