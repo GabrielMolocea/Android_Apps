@@ -6,6 +6,10 @@ import android.os.AsyncTask;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,5 +67,27 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
         }
         return data;
     }
-    
+
+    @Override
+    protected void onPostExecute(String s) {
+        try {
+            JSONObject jsonObject = new JSONObject(s);
+            JSONArray jsonArray = jsonObject.getJSONArray("routes").getJSONObject(0)
+                    .getJSONArray("legs").getJSONObject(0).getJSONArray("steps");
+
+            int count = jsonArray.length();
+            String[] polyline_array = new String[count];
+
+            JSONObject jsonObject1;
+
+            for (int i = 0; i < count; i++) {
+                jsonObject1 =  jsonArray.getJSONObject(i);
+
+                String polygon = jsonObject1.getJSONObject("polyline").getString("points");
+                polyline_array[i] = polygon;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }
