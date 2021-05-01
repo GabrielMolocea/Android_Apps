@@ -1,10 +1,16 @@
 package com.gabriel.taxifee;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
+
+import androidx.versionedparcelable.ParcelUtils;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -85,6 +91,15 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 
                 String polygon = jsonObject1.getJSONObject("polyline").getString("points");
                 polyline_array[i] = polygon;
+            }
+
+            int count2 = polyline_array.length;
+
+            for (int i = 0; i < count2; i++) {
+                PolygonOptions options = new PolygonOptions();
+                options.fillColor(Color.BLUE);
+                options.visible(true);
+                options.addAll(PolyUtil.decode(polyline_array[i]));
             }
         } catch (JSONException e) {
             e.printStackTrace();
