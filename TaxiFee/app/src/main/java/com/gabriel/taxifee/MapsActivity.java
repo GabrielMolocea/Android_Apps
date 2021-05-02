@@ -37,6 +37,9 @@ public class MapsActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        // Initialize button
+        calculate_distance = (Button) findViewById(R.id.button_calculate);
+
         getFullScreen();
 
         // Assign variables
@@ -59,7 +62,9 @@ public class MapsActivity extends FragmentActivity {
             ActivityCompat.requestPermissions(MapsActivity.this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                             Manifest.permission.ACCESS_COARSE_LOCATION}, 44);
+
         }
+
 
     }
 
@@ -104,7 +109,7 @@ public class MapsActivity extends FragmentActivity {
                         // Clearing the previously Click position
                         mMap.clear();
                         // Zooming to marker
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng1, 10));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng1, 18));
                         // Adding marker to map
                         mMap.addMarker(newMarkerOption);
 
@@ -118,12 +123,19 @@ public class MapsActivity extends FragmentActivity {
 
     public void directions() {
         StringBuilder stringBuilder = new StringBuilder();
+        Object[] dataTransfer =  new Object[4];
         stringBuilder.append("https://maps.googleapis.com/maps/api/directions/json?");
         stringBuilder.append("origin=" + latLngCurrent.latitude + "," + latLngCurrent.longitude);
         stringBuilder.append("&destination="+ destinationLat + "," + destinationLong);
         stringBuilder.append("&key=" + "AIzaSyC_BIhQV6k7XokRNsHjwYbqzX-Axt7RN2A");
 
         GetDirectionsData getDirectionsData = new GetDirectionsData(getApplicationContext());
+        dataTransfer[0] = mMap;
+        dataTransfer[1] = stringBuilder.toString();
+        dataTransfer[2] = new LatLng(latLngCurrent.latitude, latLngCurrent.longitude);
+        dataTransfer[3] = new LatLng(destinationLat, destinationLong);
+
+        getDirectionsData.execute(dataTransfer);
 
     }
     @Override
