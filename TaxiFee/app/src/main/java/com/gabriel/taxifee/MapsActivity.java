@@ -29,6 +29,7 @@ public class MapsActivity extends FragmentActivity {
     private Button calculate_distance;
     private LatLng latLngCurrent;
     private Double destinationLat, destinationLong;
+    private StringBuilder stringBuilder;
     FusedLocationProviderClient client;
 
 
@@ -115,6 +116,8 @@ public class MapsActivity extends FragmentActivity {
 
                         destinationLat = latLng1.latitude;
                         destinationLong = latLng1.longitude;
+
+                        directions();
                     });
                 });
             }
@@ -122,11 +125,11 @@ public class MapsActivity extends FragmentActivity {
     }
 
     public void directions() {
-        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder = new StringBuilder();
         Object[] dataTransfer =  new Object[4];
         stringBuilder.append("https://maps.googleapis.com/maps/api/directions/json?");
         stringBuilder.append("origin=" + latLngCurrent.latitude + "," + latLngCurrent.longitude);
-        stringBuilder.append("&destination="+ destinationLat + "," + destinationLong);
+        stringBuilder.append("&destination="+ destinationLat + "," + destinationLong + "," + "mode=driving");
         stringBuilder.append("&key=" + "AIzaSyC_BIhQV6k7XokRNsHjwYbqzX-Axt7RN2A");
 
         GetDirectionsData getDirectionsData = new GetDirectionsData(getApplicationContext());

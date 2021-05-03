@@ -90,13 +90,13 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
                 polyline_array[i] = polygon;
             }
 
-            int count2 = polyline_array.length;
+            //int count2 = polyline_array.length;
 
-            for (int i = 0; i < count2; i++) {
+            for (String value : polyline_array) {
                 PolylineOptions options2 = new PolylineOptions();
                 options2.color(Color.BLUE);
                 options2.width(10);
-                options2.addAll(PolyUtil.decode(polyline_array[i]));
+                options2.addAll(PolyUtil.decode(value));
 
                 mMap.addPolyline(options2);
             }
