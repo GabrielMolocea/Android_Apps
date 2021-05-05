@@ -2,4 +2,6 @@
     <string name="app_name">TaxiFee</string>
     <string name="title_activity_maps">Map</string>
     <string name="calculate_distance">Calculate</string>
+    
+    <string name="api_key">AIzaSyC_BIhQV6k7XokRNsHjwYbqzX-Axt7RN2A</string>
 </resources>

@@ -20,16 +20,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MapsActivity extends FragmentActivity {
 
     // Initialize variables
+    private ApiInterface apiInterface;
     private View decorView;
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
     private Button calculate_distance;
     private LatLng latLngCurrent;
-    private Double destinationLat, destinationLong;
-    private StringBuilder stringBuilder;
     FusedLocationProviderClient client;
 
 
@@ -66,8 +69,16 @@ public class MapsActivity extends FragmentActivity {
 
         }
 
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .baseUrl("https://maps.googleapis.com/")
+                .build();
 
+        apiInterface = retrofit.create(ApiInterface.class);
     }
+
+    
 
 
 
@@ -114,33 +125,13 @@ public class MapsActivity extends FragmentActivity {
                         // Adding marker to map
                         mMap.addMarker(newMarkerOption);
 
-                        destinationLat = latLng1.latitude;
-                        destinationLong = latLng1.longitude;
-
-                        directions();
                     });
                 });
             }
         });
     }
 
-    public void directions() {
-        stringBuilder = new StringBuilder();
-        Object[] dataTransfer =  new Object[4];
-        stringBuilder.append("https://maps.googleapis.com/maps/api/directions/json?");
-        stringBuilder.append("origin=" + latLngCurrent.latitude + "," + latLngCurrent.longitude);
-        stringBuilder.append("&destination="+ destinationLat + "," + destinationLong + "," + "mode=driving");
-        stringBuilder.append("&key=" + "AIzaSyC_BIhQV6k7XokRNsHjwYbqzX-Axt7RN2A");
 
-        GetDirectionsData getDirectionsData = new GetDirectionsData(getApplicationContext());
-        dataTransfer[0] = mMap;
-        dataTransfer[1] = stringBuilder.toString();
-        dataTransfer[2] = new LatLng(latLngCurrent.latitude, latLngCurrent.longitude);
-        dataTransfer[3] = new LatLng(destinationLat, destinationLong);
-
-        getDirectionsData.execute(dataTransfer);
-
-    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == 44) {
