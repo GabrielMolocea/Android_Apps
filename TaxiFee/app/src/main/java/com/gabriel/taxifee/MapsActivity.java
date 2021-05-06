@@ -20,6 +20,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -78,7 +82,27 @@ public class MapsActivity extends FragmentActivity {
         apiInterface = retrofit.create(ApiInterface.class);
     }
 
-    
+    private void getDistance(String origin, String destination) {
+        apiInterface.getDistance(getString(R.string.api_key), origin, destination)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Result>() {
+                    @Override
+                    public void onSubscribe(@org.jetbrains.annotations.NotNull Disposable d) {
+                        
+                    }
+
+                    @Override
+                    public void onSuccess(@org.jetbrains.annotations.NotNull Result result) {
+
+                    }
+
+                    @Override
+                    public void onError(@org.jetbrains.annotations.NotNull Throwable e) {
+
+                    }
+                })
+    }
 
 
 
