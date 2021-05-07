@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -80,6 +81,14 @@ public class MapsActivity extends FragmentActivity {
                 .build();
 
         apiInterface = retrofit.create(ApiInterface.class);
+
+        // Setting Button to calculate distance
+            calculate_distance.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getDistance("" + "," + "", "" + "," + ""); // Getting from current location and destination
+                }
+            });
     }
 
     private void getDistance(String origin, String destination) {
@@ -94,7 +103,7 @@ public class MapsActivity extends FragmentActivity {
 
                     @Override
                     public void onSuccess(@org.jetbrains.annotations.NotNull Result result) {
-
+                        Toast.makeText(MapsActivity.this, "Result Succes", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
