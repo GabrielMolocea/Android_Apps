@@ -38,6 +38,7 @@ public class MapsActivity extends FragmentActivity {
     private SupportMapFragment mapFragment;
     private Button calculate_distance;
     private LatLng latLngCurrent;
+    private Double destLang, destLong;
     FusedLocationProviderClient client;
 
 
@@ -97,20 +98,21 @@ public class MapsActivity extends FragmentActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Result>() {
                     @Override
-                    public void onSubscribe(@org.jetbrains.annotations.NotNull Disposable d) {
+                    public void onSubscribe(Disposable d) {
                         
                     }
 
                     @Override
-                    public void onSuccess(@org.jetbrains.annotations.NotNull Result result) {
+                    public void onSuccess(Result result) {
                         Toast.makeText(MapsActivity.this, "Result Succes", Toast.LENGTH_SHORT).show();
+
                     }
 
                     @Override
-                    public void onError(@org.jetbrains.annotations.NotNull Throwable e) {
+                    public void onError(Throwable e) {
 
                     }
-                })
+                });
     }
 
 
@@ -157,6 +159,9 @@ public class MapsActivity extends FragmentActivity {
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng1, 18));
                         // Adding marker to map
                         mMap.addMarker(newMarkerOption);
+
+                        destLang = latLng1.latitude;
+                        destLong = latLng1.longitude;
 
                     });
                 });
