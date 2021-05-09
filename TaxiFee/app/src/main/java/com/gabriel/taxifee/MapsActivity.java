@@ -19,7 +19,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
+
+import java.util.List;
 
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -37,8 +41,11 @@ public class MapsActivity extends FragmentActivity {
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
     private Button calculate_distance;
-    private LatLng latLngCurrent;
+    private LatLng latLngCurrent, destination;
     private Double destLang, destLong;
+    private Polyline bluePolyline, greyPolyline;
+    private PolylineOptions polylineOptions, bluePolylineOptions;
+    private List<LatLng> polylineList;
     FusedLocationProviderClient client;
 
 
@@ -90,7 +97,10 @@ public class MapsActivity extends FragmentActivity {
                     getDistance("" + "," + "", "" + "," + ""); // Getting from current location and destination
                 }
             });
+
     }
+
+
 
     private void getDistance(String origin, String destination) {
         apiInterface.getDistance(getString(R.string.api_key), origin, destination)
@@ -115,6 +125,18 @@ public class MapsActivity extends FragmentActivity {
                 });
     }
 
+
+    // Url for distance Api
+    private void distanceURL() {
+        String directionsApi = "http://maps.googleapis.com/maps/api/directions/";
+        String outputFormat = "json";
+        String origin = latLngCurrent.latitude  + "," + latLngCurrent.longitude;
+        String destination = destLang + "," + destLang;
+        String key = "AIzaSyC_BIhQV6k7XokRNsHjwYbqzX-Axt7RN2A";
+
+        String url = directionsApi + outputFormat + "?" + origin + "&" + destination + "&" + key;
+        System.out.println(url);
+    }
 
 
     public void getCurrentLocation() {
@@ -160,13 +182,18 @@ public class MapsActivity extends FragmentActivity {
                         // Adding marker to map
                         mMap.addMarker(newMarkerOption);
 
-                        destLang = latLng1.latitude;
-                        destLong = latLng1.longitude;
+
+                       destination = new LatLng(latLng1.latitude, latLng1.longitude);
 
                     });
                 });
             }
+            drawPath(latLngCurrent);
         });
+    }
+
+    private void drawPath(LatLng latLngCurrent) {
+        
     }
 
 
