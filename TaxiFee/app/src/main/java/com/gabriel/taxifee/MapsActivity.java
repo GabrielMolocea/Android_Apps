@@ -23,7 +23,11 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -47,6 +51,7 @@ public class MapsActivity extends FragmentActivity {
     private PolylineOptions polylineOptions, bluePolylineOptions;
     private List<LatLng> polylineList;
     FusedLocationProviderClient client;
+    private Map retunResult;
 
 
     @Override
@@ -193,7 +198,15 @@ public class MapsActivity extends FragmentActivity {
     }
 
     private void drawPath(LatLng latLngCurrent) {
-        
+        try {
+            JSONObject jsonObject = new JSONObject(retunResult);
+            JSONArray jsonArray = jsonObject.getJSONArray("routs");
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject route = jsonArray.getJSONObject(i);
+                JSONObject poly = route.getJSONObject("overview_polyline");
+            }
+        }
     }
 
 
