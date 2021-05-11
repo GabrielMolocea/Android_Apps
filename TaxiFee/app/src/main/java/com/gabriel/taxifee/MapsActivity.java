@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.android.gms.common.internal.service.Common;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -205,6 +206,8 @@ public class MapsActivity extends FragmentActivity {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject route = jsonArray.getJSONObject(i);
                 JSONObject poly = route.getJSONObject("overview_polyline");
+                String polyline = poly.getString("points");
+                polylineList = 
             }
         }
     }
