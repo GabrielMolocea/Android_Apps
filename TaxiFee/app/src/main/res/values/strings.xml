@@ -3,5 +3,5 @@
     <string name="title_activity_maps">Map</string>
     <string name="calculate_distance">Calculate</string>
     
-    <string name="api_key">AIzaSyC_BIhQV6k7XokRNsHjwYbqzX-Axt7RN2A</string>
+    <string name="access_token">sk.eyJ1IjoiZ2FicmllbG1vbG9jZWEiLCJhIjoiY2tvbG9rZzduMDlhaTJ3cG41amQ4ajlodyJ9.YLwxrS2gR3l9Yc7rVqeepA</string>
 </resources>
