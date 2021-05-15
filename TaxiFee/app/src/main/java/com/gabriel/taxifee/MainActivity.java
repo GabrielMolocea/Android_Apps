@@ -11,6 +11,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngineListener;
+import com.mapbox.android.core.location.LocationEnginePriority;
+import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -64,15 +67,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // Enabling Location
     private void enablingLocation() {
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
-            // do stuff
+            initializeLocationEngine();
+            initializeLocationLayer();
         } else {
             permissionsManager = new PermissionsManager(this);
             permissionsManager.requestLocationPermissions(this);
         }
     }
 
+    @SuppressWarnings("MissingPermission") // Check for permission already
     private void initializeLocationEngine() {
-        
+        // initialize location engine and set priority to high
+        locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
+        locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
+        locationEngine.activate();
+
+        // Getting last location
+        Location lastLocation = locationEngine.getLastLocation();
+        if (lastLocation !=null) {
+            originLocation = lastLocation;
+        } else {
+            locationEngine.addLocationEngineListener((LocationEngineListener) this);
+        }
+    }
+
+    private void initializeLocationLayer() {
+    
     }
 
     @Override
