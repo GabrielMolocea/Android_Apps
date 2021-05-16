@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
@@ -23,6 +24,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
+import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
+import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
 import com.mapbox.services.android.navigation.ui.v5.location.LocationEngineConductorListener;
 import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
 
@@ -42,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Marker destinationMarker;
     private NavigationMapRoute navigationMapRoute;
     private static final String TAG = "MainActivity";
+    private com.google.android.gms.maps.model.LatLng latLng;
 
 
     @Override
@@ -90,9 +94,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             locationEngine.addLocationEngineListener((LocationEngineListener) this);
         }
     }
-
+    @SuppressWarnings("MissingPermission") // Check for permission already
     private void initializeLocationLayer() {
-    
+        locationLayerPlugin = new LocationLayerPlugin(mapView, map, locationEngine);
+        locationLayerPlugin.setLocationLayerEnabled(true);
+        locationLayerPlugin.setCameraMode(CameraMode.TRACKING);
+        locationLayerPlugin.setRenderMode(RenderMode.NORMAL);
+
+    }
+
+    private void setCameraPosition(Location location) {
+       map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13f));
+
     }
 
     @Override
