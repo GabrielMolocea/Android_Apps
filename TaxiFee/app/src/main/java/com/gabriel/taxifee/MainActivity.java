@@ -1,185 +1,92 @@
 package com.gabriel.taxifee;
 
-import android.content.DialogInterface;
-import android.graphics.Point;
-import android.location.Location;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.widget.Button;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
 
+import com.gabriel.taxifee.databinding.ActivityMapsBinding;
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.mapbox.android.core.location.LocationEngine;
-import com.mapbox.android.core.location.LocationEngineListener;
-import com.mapbox.android.core.location.LocationEnginePriority;
-import com.mapbox.android.core.location.LocationEngineProvider;
-import com.mapbox.android.core.permissions.PermissionsListener;
-import com.mapbox.android.core.permissions.PermissionsManager;
-import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
-import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
-import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
-import com.mapbox.services.android.navigation.ui.v5.location.LocationEngineConductorListener;
-import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.List;
+public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineConductorListener,
-        PermissionsListener, MapboxMap.OnMapClickListener {
+    private static final int REQUEST_LOCATION = 404;
+    private GoogleMap mMap;
+    private ActivityMapsBinding binding;
 
-    private MapView mapView;
-    private MapboxMap map;
-    private Button calculate;
-    private PermissionsManager permissionsManager;
-    private LocationEngine locationEngine;
-    private LocationLayerPlugin locationLayerPlugin;
-    private Location originLocation;
-    private Point originPosition, destinationPosition;
-    private Marker destinationMarker;
-    private NavigationMapRoute navigationMapRoute;
-    private static final String TAG = "MainActivity";
-    private com.google.android.gms.maps.model.LatLng latLng;
-
+    boolean isPermissionGranted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Mapbox.getInstance(this, getString(R.string.access_token));
-        setContentView(R.layout.activity_maps);
-        mapView = findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
+
+        checkMyPermission();
+
+        binding = ActivityMapsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
+
 
     @Override
-    public void onMapReady(MapboxMap mapboxMap) {
-        map = mapboxMap;
-        enablingLocation();
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+        //mMap.setMyLocationEnabled(true);
+        // Add a marker in Sydney and move the camera
+        LatLng sydney = new LatLng(-34, 151);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
-    @Override
-    public void onMapClick(LatLng point) {
-
-    }
-
-    // Enabling Location
-    private void enablingLocation() {
-        if (PermissionsManager.areLocationPermissionsGranted(this)) {
-            initializeLocationEngine();
-            initializeLocationLayer();
+    private void checkMyPermission() {
+        // Checking to see if permission is already granted
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            // do stuff
         } else {
-            permissionsManager = new PermissionsManager(this);
-            permissionsManager.requestLocationPermissions(this);
+            // Location permission has not been granted
+            // Providing additional information to user if the permission was not granted
+            if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                Toast.makeText(this, "Location permission is needed to generate the best result.", Toast.LENGTH_SHORT).show();
+            }
+
+            // request location permission again
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         }
     }
 
-    @SuppressWarnings("MissingPermission") // Check for permission already
-    private void initializeLocationEngine() {
-        // initialize location engine and set priority to high
-        locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
-        locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
-        locationEngine.activate();
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_LOCATION) {
 
-        // Getting last location
-        Location lastLocation = locationEngine.getLastLocation();
-        if (lastLocation !=null) {
-            originLocation = lastLocation;
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Location has been granted
+                calculateDistanceAndPrice();
+            } else {
+                Toast.makeText(this, "Permission was not granted", Toast.LENGTH_SHORT).show();
+            }
         } else {
-            locationEngine.addLocationEngineListener((LocationEngineListener) this);
-        }
-    }
-    @SuppressWarnings("MissingPermission") // Check for permission already
-    private void initializeLocationLayer() {
-        locationLayerPlugin = new LocationLayerPlugin(mapView, map, locationEngine);
-        locationLayerPlugin.setLocationLayerEnabled(true);
-        locationLayerPlugin.setCameraMode(CameraMode.TRACKING);
-        locationLayerPlugin.setRenderMode(RenderMode.NORMAL);
-
-    }
-
-    private void setCameraPosition(Location location) {
-       map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13f));
-
-    }
-
-    @Override
-    public void onExplanationNeeded(List<String> permissionsToExplain) {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-        alertDialog.setTitle("Permissions")
-                .setMessage(R.string.permissions)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-        //Toast.makeText(this, "Need location to determinate course", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onPermissionResult(boolean granted) {
-        if (granted) {
-            enablingLocation();
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull  String[] permissions, @NonNull int[] grantResults) {
-        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    private void calculateDistanceAndPrice() {
     }
-
-    @Override
-    public void onLocationUpdate(Location location) {
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
-    }
-
-
 }
