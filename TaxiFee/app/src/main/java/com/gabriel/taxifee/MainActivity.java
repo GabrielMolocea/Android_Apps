@@ -38,6 +38,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         checkMyPermission();
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -55,6 +56,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
 
        getCurrentLocation();
 
@@ -94,6 +99,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void calculateDistanceAndPrice() {
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
