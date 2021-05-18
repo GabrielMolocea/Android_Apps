@@ -1,14 +1,16 @@
 package com.gabriel.taxifee;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.gabriel.taxifee.databinding.ActivityMapsBinding;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -22,6 +24,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
 
+    private FusedLocationProviderClient fusedLocationClient;
+
+
     boolean isPermissionGranted;
 
     @Override
@@ -29,6 +34,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
 
         checkMyPermission();
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -44,22 +51,66 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+       getCurrentLocation();
 
-            return;
+       setMarkerLocation();
+    }
+
+
+    @SuppressLint("MissingPermission")
+    private void getCurrentLocation() {
+        // Get current location
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this,
+                        location -> {
+                            if (location != null) {
+                                LatLng lastLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                                mMap.addMarker(new MarkerOptions().position(lastLocation).alpha(0));
+                                mMap.setMyLocationEnabled(true);
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastLocation, 18f));
+                            }
+                        });
+    }
+
+    // Setting a new Marker on mat as a destination
+    private void setMarkerLocation() {
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                MarkerOptions destinationMarker = new MarkerOptions().position(latLng);
+                mMap.clear();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f));
+                mMap.addMarker(destinationMarker);
+            }
+        });
+    }
+
+
+    private void display
+
+    private void calculateDistanceAndPrice() {
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_LOCATION) {
+
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Location has been granted
+                getCurrentLocation();
+                calculateDistanceAndPrice();
+            } else {
+                Toast.makeText(this, "Permission was not granted", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-        //mMap.setMyLocationEnabled(true);
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     private void checkMyPermission() {
         // Checking to see if permission is already granted
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // do stuff
+            getCurrentLocation();
         } else {
             // Location permission has not been granted
             // Providing additional information to user if the permission was not granted
@@ -72,21 +123,26 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == REQUEST_LOCATION) {
-
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Location has been granted
-                calculateDistanceAndPrice();
-            } else {
-                Toast.makeText(this, "Permission was not granted", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
-    private void calculateDistanceAndPrice() {
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+
 }
