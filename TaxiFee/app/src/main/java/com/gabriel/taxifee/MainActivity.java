@@ -4,9 +4,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import com.gabriel.taxifee.databinding.ActivityMapsBinding;
@@ -77,14 +79,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Setting a new Marker on mat as a destination
     private void setMarkerLocation() {
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                MarkerOptions destinationMarker = new MarkerOptions().position(latLng);
-                mMap.clear();
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f));
-                mMap.addMarker(destinationMarker);
-            }
+        mMap.setOnMapClickListener(latLng -> {
+            MarkerOptions destinationMarker = new MarkerOptions().position(latLng);
+            mMap.clear();
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f));
+            mMap.addMarker(destinationMarker);
         });
     }
 
@@ -164,5 +163,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         super.onStop();
     }
 
-
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+    }
 }
