@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.fragment.app.FragmentActivity;
@@ -23,6 +24,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int REQUEST_LOCATION = 404;
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
+
+    private View decorView;
 
     private FusedLocationProviderClient fusedLocationClient;
 
@@ -86,7 +89,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private void display
+    private void display(){
+
+    }
 
     private void calculateDistanceAndPrice() {
     }
@@ -111,6 +116,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         // Checking to see if permission is already granted
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             getCurrentLocation();
+            isPermissionGranted = true;
         } else {
             // Location permission has not been granted
             // Providing additional information to user if the permission was not granted
@@ -123,6 +129,20 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    // Set vew as Full Screen
+    private void getFullScreen() {
+        decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE
+                        // Set the content to appear under the system bars so that the
+                        // content doesn't resize when the system bars hide and show.
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        // Hide the nav bar and status bar
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
 
     @Override
     protected void onDestroy() {
