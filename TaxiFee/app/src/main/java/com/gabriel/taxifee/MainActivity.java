@@ -2,7 +2,9 @@ package com.gabriel.taxifee;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.view.View;
@@ -20,6 +22,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Task;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -31,6 +34,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private FusedLocationProviderClient fusedLocationClient;
 
+    ProgressDialog progressDialog;
 
     boolean isPermissionGranted;
 
@@ -50,6 +54,19 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        drawPolyline();
+    }
+
+    private void drawPolyline() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Please wait, route is being created");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        // Checking whether star and end location are selected
+        // Getting URL to Google direction on API
+        String url = getDirectionsUrl(getCurrentLocation(), setMarkerLocation());
     }
 
 
@@ -68,7 +85,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     @SuppressLint("MissingPermission")
-    private void getCurrentLocation() {
+    protected void getCurrentLocation() {
         // Get current location
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this,
@@ -80,6 +97,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastLocation, 18f));
                             }
                         });
+        Task<Location> currentLocation = fusedLocationClient.getLastLocation();
     }
 
     // Setting a new Marker on mat as a destination
