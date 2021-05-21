@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Toast;
 
@@ -38,6 +40,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     boolean isPermissionGranted;
 
+    // Getting origin and dest lat and long
+    LatLng origin, destination;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +71,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Checking whether star and end location are selected
         // Getting URL to Google direction on API
-        String url = getDirectionsUrl(getCurrentLocation(), setMarkerLocation());
+        String url = getDirectionsUrl(origin, destination);
+
+        Log.d("url", url + "");
+        DownloadTask downloadTask = new DownloadTask();
+
+        // Starting downloading JSON data form Google API
+        downloadTask.execute(url);
     }
 
 
@@ -91,10 +102,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 .addOnSuccessListener(this,
                         location -> {
                             if (location != null) {
-                                LatLng lastLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                                mMap.addMarker(new MarkerOptions().position(lastLocation).alpha(0));
+                                origin = new LatLng(location.getLatitude(), location.getLongitude());
+                                mMap.addMarker(new MarkerOptions().position(origin).alpha(0));
                                 mMap.setMyLocationEnabled(true);
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastLocation, 18f));
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 18f));
                             }
                         });
         Task<Location> currentLocation = fusedLocationClient.getLastLocation();
@@ -107,6 +118,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.clear();
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f));
             mMap.addMarker(destinationMarker);
+
+            destination = destinationMarker.getPosition();
         });
     }
 
@@ -191,4 +204,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
     }
+
+
 }
