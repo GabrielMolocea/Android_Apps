@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -141,8 +142,54 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             ArrayList points = null;
             PolylineOptions polylineOptions = null;
 
-            for ()
+            for (int i = 0; i < result.size(); i++) {
+                points = new ArrayList();
+                polylineOptions = new PolylineOptions();
+                List<HashMap<String, String>> path = result.get(i);
+
+                for (int j = 0; j < path.size(); j++) {
+                    HashMap<String, String> point = path.get(j);
+
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+
+                    points.add(position);
+
+                }
+
+                polylineOptions.addAll(points);
+                polylineOptions.width(12);
+                polylineOptions.color(Color.RED);
+                polylineOptions.geodesic(true);
+            }
+
+        mMap.addPolyline(polylineOptions);
         }
+
+    }
+
+    private String getDirectionsUrl(LatLng origin, LatLng destination) {
+        // Origin of route
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+
+        // Destination of route
+        String str_dest = "destination=" + destination.latitude + "," + destination.longitude;
+
+        // Sensor enabled
+        String sensor = "sensor=false";
+        String mode = "mode=driving";
+        // Building the parameters to the web service
+        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode;
+
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
+
+
+        return url;
     }
 
     @Override
