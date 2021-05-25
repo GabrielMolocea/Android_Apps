@@ -16,7 +16,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
-import com.gabriel.taxifee.databinding.ActivityMapsBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,7 +27,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -45,7 +43,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private static final int REQUEST_LOCATION = 404;
     private GoogleMap mMap;
-    private ActivityMapsBinding binding;
 
     private View decorView;
 
@@ -67,8 +64,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        binding = ActivityMapsBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -95,10 +91,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         downloadTask.execute(url);
     }
 
+
+    @SuppressLint("StaticFieldLeak")
     private class DownloadTask extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... url) {
+
             String data = "";
 
             try {
@@ -108,7 +107,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             }
             return data;
         }
-
 
         @Override
         protected void onPostExecute(String result) {
@@ -122,20 +120,24 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+
+
     // Class that parse the Google Places to JSON Format
     private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
+        // Parsing the data in non-ui thread
         @Override
         protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
-            JSONObject jsonObject;
+
+            JSONObject jObject;
             List<List<HashMap<String, String>>> routes = null;
 
             try {
-                jsonObject = new JSONObject(jsonData[0]);
-                DirectionJSONParser parser= new DirectionJSONParser();
+                jObject = new JSONObject(jsonData[0]);
+                DirectionJSONParser parser = new DirectionJSONParser();
 
-                routes = parser.parse(jsonObject);
-            } catch (JSONException e) {
+                routes = parser.parse(jObject);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return routes;
@@ -143,14 +145,16 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+
             progressDialog.dismiss();
             Log.d("result", result.toString());
             ArrayList points = null;
-            PolylineOptions polylineOptions = null;
+            PolylineOptions lineOptions = null;
 
             for (int i = 0; i < result.size(); i++) {
                 points = new ArrayList();
-                polylineOptions = new PolylineOptions();
+                lineOptions = new PolylineOptions();
+
                 List<HashMap<String, String>> path = result.get(i);
 
                 for (int j = 0; j < path.size(); j++) {
@@ -161,18 +165,18 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     LatLng position = new LatLng(lat, lng);
 
                     points.add(position);
-
                 }
 
-                polylineOptions.addAll(points);
-                polylineOptions.width(12);
-                polylineOptions.color(Color.RED);
-                polylineOptions.geodesic(true);
+                lineOptions.addAll(points);
+                lineOptions.width(12);
+                lineOptions.color(Color.RED);
+                lineOptions.geodesic(true);
+
             }
 
-        mMap.addPolyline(polylineOptions);
+            // Drawing polyline in the Google Map for the i-th route
+            mMap.addPolyline(lineOptions);
         }
-
     }
 
     private String getDirectionsUrl(LatLng origin, LatLng destination) {
