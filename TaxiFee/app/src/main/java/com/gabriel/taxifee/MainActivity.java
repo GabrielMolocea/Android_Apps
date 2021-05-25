@@ -4,12 +4,9 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -24,20 +21,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
-
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -59,7 +51,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         checkMyPermission();
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -71,113 +62,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        drawPolyline();
     }
 
-    private void drawPolyline() {
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Please wait, route is being created");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
-
-        // Checking whether star and end location are selected
-        // Getting URL to Google direction on API
-        String url = getDirectionsUrl(origin, destination);
-
-        Log.d("url", url + "");
-        DownloadTask downloadTask = new DownloadTask();
-
-        // Starting downloading JSON data form Google API
-        downloadTask.execute(url);
-    }
-
-
-    @SuppressLint("StaticFieldLeak")
-    private class DownloadTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... url) {
-
-            String data = "";
-
-            try {
-                data = downloadUrl(url[0]);
-            } catch (Exception e) {
-                Log.d("Background Task", e.toString());
-            }
-            return data;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-            ParserTask parserTask = new ParserTask();
-
-
-            parserTask.execute(result);
-
-        }
-    }
-
-
-
-    // Class that parse the Google Places to JSON Format
-    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
-
-        // Parsing the data in non-ui thread
-        @Override
-        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
-
-            JSONObject jObject;
-            List<List<HashMap<String, String>>> routes = null;
-
-            try {
-                jObject = new JSONObject(jsonData[0]);
-                DirectionJSONParser parser = new DirectionJSONParser();
-
-                routes = parser.parse(jObject);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return routes;
-        }
-
-        @Override
-        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
-
-            progressDialog.dismiss();
-            Log.d("result", result.toString());
-            ArrayList points = null;
-            PolylineOptions lineOptions = null;
-
-            for (int i = 0; i < result.size(); i++) {
-                points = new ArrayList();
-                lineOptions = new PolylineOptions();
-
-                List<HashMap<String, String>> path = result.get(i);
-
-                for (int j = 0; j < path.size(); j++) {
-                    HashMap<String, String> point = path.get(j);
-
-                    double lat = Double.parseDouble(point.get("lat"));
-                    double lng = Double.parseDouble(point.get("lng"));
-                    LatLng position = new LatLng(lat, lng);
-
-                    points.add(position);
-                }
-
-                lineOptions.addAll(points);
-                lineOptions.width(12);
-                lineOptions.color(Color.RED);
-                lineOptions.geodesic(true);
-
-            }
-
-            // Drawing polyline in the Google Map for the i-th route
-            mMap.addPolyline(lineOptions);
-        }
-    }
 
     private String getDirectionsUrl(LatLng origin, LatLng destination) {
         // Origin of route
@@ -196,29 +82,26 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         String output = "json";
 
         // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
 
 
-        return url;
+        return "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
     }
 
-    private String downloadUrl(String strUrl) throws IOException {
-        String data = "" ;
+    private String downloadURL(String stringUrl) throws IOException {
+        String data = null, line;
         InputStream inputStream = null;
-        HttpURLConnection urlConnection = null;
+        HttpURLConnection httpURLConnection = null;
 
         try {
-            URL url = new URL(strUrl);
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.connect();
+            URL url1 = new URL(stringUrl);
+            httpURLConnection = (HttpURLConnection) url1.openConnection();
+            httpURLConnection.connect();
 
-            inputStream = urlConnection.getInputStream();
+            inputStream = httpURLConnection.getInputStream();
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
             StringBuffer stringBuffer = new StringBuffer();
-
-            String line = "";
 
             while ((line = bufferedReader.readLine()) != null) {
                 stringBuffer.append(line);
@@ -227,16 +110,19 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             data = stringBuffer.toString();
 
             bufferedReader.close();
-
-            Log.d("data", data);
-        } catch (Exception e) {
-            Log.d("Exception ", e.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             inputStream.close();
-            urlConnection.disconnect();
+            httpURLConnection.disconnect();
         }
         return data;
     }
+
+    class GetDirections(String url) {
+
+    }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -246,9 +132,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
 
-       getCurrentLocation();
+        getCurrentLocation();
 
-       setMarkerLocation();
+        setDestinationMarker();
     }
 
 
@@ -269,7 +155,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     // Setting a new Marker on mat as a destination
-    private void setMarkerLocation() {
+    private void setDestinationMarker() {
         mMap.setOnMapClickListener(latLng -> {
             MarkerOptions destinationMarker = new MarkerOptions().position(latLng);
             mMap.clear();
